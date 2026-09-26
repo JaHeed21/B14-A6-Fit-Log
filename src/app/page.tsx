@@ -20,7 +20,7 @@ export default async function Home() {
     <main className="bg-[#090a0c] px-4 pb-12 sm:px-6 lg:px-8">
       <Banner />
 
-      <section className="mx-auto mt-10 w-auto">
+      <section id="library" className="mx-auto mt-10 w-auto">
         <div className="mb-5">
           <h1 className="font-oswald text-2xl font-bold uppercase text-white sm:text-3xl">
             The library

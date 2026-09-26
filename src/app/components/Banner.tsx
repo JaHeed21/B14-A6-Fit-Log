@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import banner from "../assets/banner.png";
 
 export default function Banner() {
@@ -21,10 +23,11 @@ export default function Banner() {
           </p>
 
           <Link
-            href="/workouts"
-            className="mt-6 inline-flex h-9 items-center rounded-[5px] bg-[#c2f800] px-[22px] text-[11px] font-bold uppercase tracking-[0.02em] text-black transition-colors hover:bg-[#d5ff4a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2f800]"
+            href="#library"
+            className="mt-6 inline-flex h-9 items-center gap-2 rounded-[5px] bg-[#c2f800] px-[22px] text-[11px] font-bold uppercase tracking-[0.02em] text-black transition-colors hover:bg-[#d5ff4a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2f800]"
           >
-            Browse workouts
+            <span>BROWSE WORKOUTS</span>
+            <FontAwesomeIcon icon={faArrowDown} aria-hidden="true" />
           </Link>
         </div>
 

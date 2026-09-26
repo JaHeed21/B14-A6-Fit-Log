@@ -47,7 +47,9 @@ export default function WorkoutActions({ workout }: WorkoutActionsProps) {
     if (added) {
       toast.success(`${workout.name} added to today's plan.`);
     } else {
-      toast.error("Today's plan is full. Remove a workout before adding another.");
+      toast.error(
+        "Today's plan is full. Remove a workout before adding another.",
+      );
     }
   }
 
