@@ -2,9 +2,38 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import logo from "@/app/assets/logo.png";
+import {
+  getPlanWorkouts,
+  getSavedWorkouts,
+  WORKOUTS_UPDATED_EVENT,
+} from "../lib/workoutStorage";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const isMyPlan = pathname === "/my-plan";
+  const [planCount, setPlanCount] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
+
+  useEffect(() => {
+    function refreshCounts() {
+      setPlanCount(getPlanWorkouts().length);
+      setSavedCount(getSavedWorkouts().length);
+    }
+
+    refreshCounts();
+    window.addEventListener(WORKOUTS_UPDATED_EVENT, refreshCounts);
+    window.addEventListener("storage", refreshCounts);
+
+    return () => {
+      window.removeEventListener(WORKOUTS_UPDATED_EVENT, refreshCounts);
+      window.removeEventListener("storage", refreshCounts);
+    };
+  }, []);
+
   return (
     <nav className="navbar w-auto bg-base-200 border-t border-base-300 px-6">
       {/* Left: Logo */}
@@ -24,7 +53,7 @@ export default function Navbar() {
             <Link
               href="/"
               className={`btn rounded-full px-5 ${
-                1 ? "bg-[#4b5235] text-[#C2F800]" : "btn-ghost"
+                isHome ? "bg-[#4b5235] text-[#C2F800]" : "btn-ghost"
               }`}
             >
               Workouts
@@ -35,7 +64,7 @@ export default function Navbar() {
             <Link
               href="/my-plan"
               className={`btn btn-sm rounded-full px-5 ${
-                0 ? "bg-[#4b5235] text-[#C2F800]" : "btn-ghost"
+                isMyPlan ? "bg-[#4b5235] text-[#C2F800]" : "btn-ghost"
               }`}
             >
               My Plan
@@ -52,7 +81,7 @@ export default function Navbar() {
         >
           <span className="text-sm">Plan</span>
           <span className="badge bg-[#C2F800] text-black badge-sm font-bold">
-            0
+            {planCount}
           </span>
         </Link>
 
@@ -61,7 +90,9 @@ export default function Navbar() {
           className="flex items-center gap-2 text-base-content hover:text-white"
         >
           <span className="text-sm">Saved</span>
-          <span className="text-sm font-semibold text-base-content">0</span>
+          <span className="text-sm font-semibold text-base-content">
+            {savedCount}
+          </span>
         </Link>
       </div>
     </nav>
