@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { toast } from "react-toastify";
 import {
   faCheck,
   faChevronDown,
@@ -79,9 +80,13 @@ export default function MyPlanPage() {
   );
 
   function removeVisibleWorkout(workoutId: number) {
+    const workout = activeWorkouts.find((item) => item.id === workoutId);
     removeWorkout(
       activeTab === "today" ? PLAN_STORAGE_KEY : SAVED_STORAGE_KEY,
       workoutId,
+    );
+    toast.success(
+      `${workout?.name ?? "Workout"} removed from ${activeTab === "today" ? "today's plan" : "saved workouts"}.`,
     );
   }
 

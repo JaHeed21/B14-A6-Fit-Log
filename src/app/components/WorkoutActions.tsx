@@ -3,12 +3,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark, faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import type { Workout } from "./WorkoutCard";
 import {
   hasWorkout,
   PLAN_STORAGE_KEY,
   SAVED_STORAGE_KEY,
   toggleWorkout,
+  WORKOUTS_UPDATED_EVENT,
 } from "../lib/workoutStorage";
 
 type WorkoutActionsProps = {
@@ -20,18 +22,44 @@ export default function WorkoutActions({ workout }: WorkoutActionsProps) {
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
-    setIsAdded(hasWorkout(PLAN_STORAGE_KEY, workout.id));
-    setIsSaved(hasWorkout(SAVED_STORAGE_KEY, workout.id));
+    function syncWorkoutState() {
+      setIsAdded(hasWorkout(PLAN_STORAGE_KEY, workout.id));
+      setIsSaved(hasWorkout(SAVED_STORAGE_KEY, workout.id));
+    }
+
+    syncWorkoutState();
+    window.addEventListener(WORKOUTS_UPDATED_EVENT, syncWorkoutState);
+    window.addEventListener("storage", syncWorkoutState);
+
+    return () => {
+      window.removeEventListener(WORKOUTS_UPDATED_EVENT, syncWorkoutState);
+      window.removeEventListener("storage", syncWorkoutState);
+    };
   }, [workout.id]);
 
   function togglePlan() {
+    if (isAdded) return;
+
     const result = toggleWorkout(PLAN_STORAGE_KEY, workout, 5);
-    setIsAdded(result.workouts.some((item) => item.id === workout.id));
+    const added = result.workouts.some((item) => item.id === workout.id);
+    setIsAdded(added);
+
+    if (added) {
+      toast.success(`${workout.name} added to today's plan.`);
+    } else {
+      toast.error("Today's plan is full. Remove a workout before adding another.");
+    }
   }
 
   function toggleSaved() {
     const result = toggleWorkout(SAVED_STORAGE_KEY, workout);
-    setIsSaved(result.workouts.some((item) => item.id === workout.id));
+    const saved = result.workouts.some((item) => item.id === workout.id);
+    setIsSaved(saved);
+    toast.success(
+      saved
+        ? `${workout.name} saved for later.`
+        : `${workout.name} removed from saved workouts.`,
+    );
   }
 
   return (
@@ -45,9 +73,10 @@ export default function WorkoutActions({ workout }: WorkoutActionsProps) {
             : `Add ${workout.name} to today's plan`
         }
         onClick={togglePlan}
+        disabled={isAdded}
         className={`inline-flex h-9 items-center gap-2 rounded-[5px] px-4 text-[11px] font-bold transition-colors ${
           isAdded
-            ? "bg-[#39420f] text-[#c2f800]"
+            ? "cursor-not-allowed bg-[#39420f] text-[#c2f800] opacity-75"
             : "bg-[#c2f800] text-black hover:bg-[#d5ff4a]"
         }`}
       >
