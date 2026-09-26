@@ -92,6 +92,7 @@ export default async function WorkoutDetailsPage({
                 ))}
               </ol>
             </div>
+            <WorkoutActions workout={workout} />
           </div>
         </section>
       </div>
